@@ -1,9 +1,8 @@
 #include "foo.h"
 #include "utils.h"
 
-
-std::string concat(std::string const& a, std::string const& b)
+std::string copy(std::string other)
 {
     utility();
-    return a + b;
+    return other;
 }
