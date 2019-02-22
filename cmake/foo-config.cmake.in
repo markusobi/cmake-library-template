@@ -1,5 +1,5 @@
 @PACKAGE_INIT@
 
-if(NOT TARGET foo::foo)
+if(NOT TARGET foo::bar)
     include(${CMAKE_CURRENT_LIST_DIR}/foo-targets.cmake)
 endif()
