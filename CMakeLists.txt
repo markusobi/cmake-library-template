@@ -25,22 +25,23 @@ target_include_directories(${LIBRARY_NAME}
         # the headers, that are only needed to compile our target and shall not be visible to anyone else
         ${CMAKE_CURRENT_SOURCE_DIR}/src
     PUBLIC
-        # the include directory when building this library
+        # the include directory must be available while building and at a new location after installing
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        # the include directory that we want to distribute on install
         $<INSTALL_INTERFACE:include>
 )
 
 # in order to use this project via add_subdirectory, we need to create an alias
 add_library(${PACKAGE_NAME}::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
 
-# auto export all function/class symbols when compiled as shared windows library
-set_target_properties(${LIBRARY_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
-
 # optional: set the required C++ standard for compiling this target
 # target_compile_features(${LIBRARY_NAME} PRIVATE cxx_std_11)
 
-#  --------- install and export ---------
+# auto export all function/class symbols when compiled as shared windows library
+set_target_properties(${LIBRARY_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+
+
+#  --------- install binaries and headers ---------
 
 include(GNUInstallDirs)
 
@@ -58,6 +59,8 @@ install(
     DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+
+#  --------- install cmake package ---------
 
 # a user defined variable for the directory where we want to install all the .cmake files
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME})
