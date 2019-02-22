@@ -1,5 +1,5 @@
-#include "bar.h"
-#include "utils.h"
+#include <bar.h>
+#include <utils/utils.h>
 
 std::string copy(std::string other)
 {

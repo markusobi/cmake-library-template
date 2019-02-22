@@ -1,26 +1,24 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(foo VERSION 1.0 LANGUAGES CXX)
+project(foo
+    VERSION 1.0
+    LANGUAGES CXX
+)
 
 #  --------- targets and dependencies ---------
 
 set(PACKAGE_NAME foo)
 set(LIBRARY_NAME bar)
 
-SET(${LIBRARY_NAME}_SRC
-    # put all your source files here
-    src/bar.cpp
-)
-
 # add the library target with the given source files
-add_library(${LIBRARY_NAME} ${${LIBRARY_NAME}_SRC})
+add_library(${LIBRARY_NAME} "")
 
-# TODO figure out WINDOWS_EXPORT_ALL_SYMBOLS
-#include(GenerateExportHeader)
-#generate_export_header(${LIBRARY_NAME})
-
-# in order to use this project via add_subdirectory, we need to create an alias
-add_library(${PACKAGE_NAME}::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
+# benefit of adding a header as source: it will listed in the IDE
+target_sources(${LIBRARY_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/src/bar/bar.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/utils/utils.h
+)
 
 target_include_directories(${LIBRARY_NAME}
     PRIVATE
@@ -33,15 +31,20 @@ target_include_directories(${LIBRARY_NAME}
         $<INSTALL_INTERFACE:include>
 )
 
-# set the required C++ standard for compiling this target
-target_compile_features(${LIBRARY_NAME} PRIVATE cxx_std_11)
+# in order to use this project via add_subdirectory, we need to create an alias
+add_library(${PACKAGE_NAME}::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
+
+# auto export all function/class symbols when compiled as shared windows library
+set_target_properties(${LIBRARY_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+# optional: set the required C++ standard for compiling this target
+# target_compile_features(${LIBRARY_NAME} PRIVATE cxx_std_11)
 
 #  --------- install and export ---------
 
-# install the files needed for linking (.so, .a, .lib, .dll)
-
 include(GNUInstallDirs)
 
+# install the executables and files needed for linking (.so, .a, .lib, .dll)
 install(
     TARGETS ${LIBRARY_NAME} #if you have more targets to export, put them here
     EXPORT ${PACKAGE_NAME}-targets
@@ -56,7 +59,7 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-# a custom variable for the directory where we want to install all the .cmake files
+# a user defined variable for the directory where we want to install all the .cmake files
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME})
 
 # generate *-targets.cmake and *-targets-${DCMAKE_BUILD_TYPE}.cmake for exported targets
@@ -84,8 +87,9 @@ configure_package_config_file(
 )
 
 # install the *-config.cmake and *-config-version.cmake
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}-config.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}-config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake
     DESTINATION ${INSTALL_CONFIGDIR}
 )
